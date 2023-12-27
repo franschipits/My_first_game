@@ -10,7 +10,7 @@ test_font = pygame.font.Font('static/font/Pixeltype.ttf', 50) #args (font type, 
 sky_surface = pygame.image.load('static/images/Sky.png').convert() #.convert=it converts to a type of image pygame can work with more easily and makes the game run faster
 ground_surface = pygame.image.load('static/images/ground.png').convert()
 
-score_surface = test_font.render("My Game", False, 'Black') #args (text, Anti-Aliasing, color) AA = smooth edges
+score_surface = test_font.render("My Game", False, (64,64,64)) #args (text, Anti-Aliasing, color) AA = smooth edges
 score_rect = score_surface.get_rect(center = (400, 50)) #400 is half of width of screen so it's in the middle and 50 is what we used screen.blit(score_surface, (300,50)) down bellow before
 
 snail_surface = pygame.image.load('static/images/snail1.png').convert_alpha() #removing alpha values
@@ -39,6 +39,10 @@ while True:
                                          #2 arguments (surface, position)
                                          #position = distance from left to right and from top to bottom
     screen.blit(ground_surface,(0, 300))
+    pygame.draw.rect(screen, '#c0e8ec', score_rect) #can use .draw to draw a lot of different things (read documentation)
+    pygame.draw.rect(screen, '#c0e8ec', score_rect, 10) 
+    #pygame.draw.line(screen, 'Gold', (0,0), pygame.mouse.get_pos(), 10) #params: (where you want to draw, color of the line, start point, end point, width of the line)
+                                                                        #pygame.mouse.get_pos(): makes the line move acording with the mouse position
     screen.blit(score_surface,score_rect)
     # snail_x_position -= 4
     # if snail_x_position < -100:
