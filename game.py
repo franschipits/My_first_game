@@ -1,5 +1,6 @@
 import pygame
 from sys import exit
+from random import randint
 
 def display_score():
     current_time = int(pygame.time.get_ticks() / 1000) - start_time
@@ -8,7 +9,20 @@ def display_score():
     screen.blit(score_surface, score_rect)
     return current_time
     
+def obstacle_movement(obstacle_list):
+    if obstacle_list:
+        for obstacle_rect in obstacle_list:
+            obstacle_rect.x -= 5
 
+            screen.blit(snail_surface,obstacle_rect)
+        
+        obstacle_list = [obstacle for obstacle in obstacle_list if obstacle.x > -100]
+
+        return obstacle_list
+    
+    else:
+        return [] 
+    
 pygame.init() #initializing pygame
 screen = pygame.display.set_mode((800, 400)) #args (width, height)
 pygame.display.set_caption('My first game')
@@ -24,17 +38,19 @@ ground_surface = pygame.image.load('static/images/ground.png').convert()
 # score_surface = test_font.render("My Game", False, (64,64,64)) #args (text, Anti-Aliasing, color) AA = smooth edges
 # score_rect = score_surface.get_rect(center = (400, 50)) #400 is half of width of screen so it's in the middle and 50 is what we used screen.blit(score_surface, (300,50)) down bellow before
 
-snail_surface = pygame.image.load('static/images/snail1.png').convert_alpha() #removing alpha values
-#snail_x_position = 600
+# Obstacles
+snail_surface = pygame.image.load('static/images/snail1.png').convert_alpha() #removing alpha values 
 snail_rect = snail_surface.get_rect(bottomright = (600,300))
+
+obstacle_rect_list = []
 
 player_surf = pygame.image.load('static/images/player_walk_1.png').convert_alpha()
 player_rect = player_surf.get_rect(midbottom = (80,300)) #(topleft=(x,y))
-                                                        #could also do:pygame.Rect(left, top, width, height)
-                                                        #will use a Sprite Class to combine surface and rectangle later
+                                                         #could also do:pygame.Rect(left, top, width, height)
+                                                         #will use a Sprite Class to combine surface and rectangle later
 player_gravity = 0
 
-# Intro screen:
+# Intro screen
 player_stand = pygame.image.load('static/images/player_stand.png').convert_alpha()
 player_stand = pygame.transform.rotozoom(player_stand,0,2)
 player_stand_rect = player_stand.get_rect(center = (400,200))
@@ -44,6 +60,11 @@ game_name_rect = game_name.get_rect(center = (400,80))
 
 game_message = test_font.render('Press space to run', False, (111,196,169))
 game_message_rect = game_message.get_rect(center = (400,320))
+
+
+# Timer
+obstacle_timer = pygame.USEREVENT + 1
+pygame.time.set_timer(obstacle_timer, 1500)
 
 while True:
     for event in pygame.event.get(): #checking all events possible and looping through each event
@@ -67,11 +88,14 @@ while True:
                 game_active = True
                 snail_rect.left = 800
                 start_time = int(pygame.time.get_ticks() / 1000)
+            
+        if event.type == obstacle_timer and game_active:
+            obstacle_rect_list.append(snail_surface.get_rect(bottomright = (randint(900, 1100),300)))
 
     if game_active:
         screen.blit(sky_surface,(0, 0)) #blit= block image transfer (put one surface in another surface) 
-                                            #2 arguments (surface, position)
-                                            #position = distance from left to right and from top to bottom
+                                        #2 arguments (surface, position)
+                                        #position = distance from left to right and from top to bottom
         screen.blit(ground_surface,(0, 300))
         # pygame.draw.rect(screen, '#c0e8ec', score_rect) #can use .draw to draw a lot of different things (read documentation)
         # pygame.draw.rect(screen, '#c0e8ec', score_rect, 10) 
@@ -79,31 +103,32 @@ while True:
         # #pygame.mouse.get_pos(): makes the line move acording with the mouse position
         # screen.blit(score_surface,score_rect)
         score = display_score()
-        # snail_x_position -= 4
-        # if snail_x_position < -100:
-        #     snail_x_position = 800
-        snail_rect.x -= 4
-        screen.blit(snail_surface,snail_rect)
-        if snail_rect.right <= 0:
-            snail_rect.left = 800 #if the snail desapears from the screen, it appears back on the screen using the screen's width 800 from the top of the coding
-        #to move the player: player_rect.left += 1
-        #to know the player's position: print(player_rect.left)
         
-        # Player:
+        # snail_rect.x -= 4
+        # screen.blit(snail_surface,snail_rect)
+        # if snail_rect.right <= 0:
+        #     snail_rect.left = 800 #if the snail desapears from the screen, it appears back on the screen using the screen's width 800 from the top of the coding
+                                    #to move the player: player_rect.left += 1
+                                    #to know the player's position: print(player_rect.left)
+        
+        # Player
         player_gravity += 1
         player_rect.y += player_gravity
         if player_rect.bottom >= 300: #300 because it's the top of the ground
             player_rect.bottom = 300
         screen.blit(player_surf, player_rect)
 
-        # Collision:
+        # Obstacle movement
+        obstacle_rect_list = obstacle_movement(obstacle_rect_list)
+
+        # Collision
         if snail_rect.colliderect(player_rect):
             game_active = False
     else:
         screen.fill((94,129,162))
         screen.blit(player_stand,player_stand_rect)
 
-        score_message = test_font.render(f'Your score: {score}', False, (111,196,169))
+        score_message = test_font.render(f'Your score: {score}', False, (111,196,169)) 
         score_message_rect = score_message.get_rect(center = (400,330))
         screen.blit(game_name,game_name_rect)
 
