@@ -1,7 +1,8 @@
 from typing import Any
 import pygame
 from sys import exit
-from random import randint, choice
+from random import randint, choice 
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -16,7 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom = (80,300))
         self.gravity = 0
 
-        # self.jump_sound = pygame.mixer.Sound('static/audio/jump.mp3') #import sound
+        # self.jump_sound = pygame.mixer.Sound('audio/jump.mp3') #import sound
         # self.jump_sound.set_volume(0.5)
 
     def player_input(self):
@@ -133,6 +134,7 @@ def player_animation():
         player_surface = player_walk[int(player_index)]
 
 pygame.init() #initializing pygame
+#pygame.mixer.init()
 screen = pygame.display.set_mode((800, 400)) #args (width, height)
 pygame.display.set_caption('My first game')
 clock = pygame.time.Clock() #creates a clock object
@@ -141,7 +143,7 @@ game_active = False
 start_time = 0
 score = 0
 
-# bg_music = pygame.mixer.Sound('static/audio/music.wav')
+# bg_music = pygame.mixer.Sound('audio/music.wav')
 # bg_music.play(loops = -1)
 
 # Groups
